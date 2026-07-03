@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Popshot · video feed</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #0b0b10;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* main container – full screen feed */
+    .feed-container {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      max-height: 820px;
+      background: #0f0f16;
+      border-radius: 0;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(255, 70, 120, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* top bar – popshot branding */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.2rem 0.6rem;
+      background: linear-gradient(180deg, rgba(11, 11, 16, 0.8) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .top-bar .brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: white;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+      pointer-events: auto;
+    }
+
+    .top-bar .brand i {
+      background: linear-gradient(145deg, #ff3b6f, #ff8a5c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 12px #ff3b6f55);
+      font-size: 1.9rem;
+    }
+
+    .top-bar .brand span {
+      background: linear-gradient(145deg, #ffffff, #d0d0f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .top-bar .actions {
+      display: flex;
+      gap: 1.2rem;
+      pointer-events: auto;
+      font-size: 1.3rem;
+      color: #f0f0ff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .top-bar .actions i {
+      cursor: pointer;
+      transition: 0.2s;
+      opacity: 0.85;
+    }
+
+    .top-bar .actions i:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    /* video scroll container */
+    .video-scroll {
+      flex: 1;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      height: 100%;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      padding: 0;
+      margin: 0;
+    }
+
+    .video-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* each video item – snap */
+    .video-item {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      max-height: 820px;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: #12121e;
+      overflow: hidden;
+    }
+
+    /* video placeholder + gradient overlay */
+    .video-placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #1b1b2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: #3a3a5a;
+    }
+
+    .video-placeholder i {
+      opacity: 0.3;
+      filter: drop-shadow(0 0 30px #ff3b6f22);
+    }
+
+    .video-item .gradient-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* video info overlay (bottom) */
+    .video-info {
+      position: relative;
+      z-index: 10;
+      padding: 1.5rem 1.2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      pointer-events: none;
+    }
+
+    .video-info .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+    }
+
+    .video-info .user i {
+      font-size: 1.2rem;
+      background: #2a2a44;
+      padding: 6px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+
+    .video-info .caption {
+      font-size: 0.95rem;
+      color: #e8e8ff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+      max-width: 80%;
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    .video-info .caption i {
+      margin-right: 8px;
+      color: #ff5a7c;
+    }
+
+    /* right action buttons (like, comment, share) */
+    .side-actions {
+      position: absolute;
+      right: 12px;
+      bottom: 120px;
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      pointer-events: auto;
+    }
+
+    .side-actions .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #f0f0ff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 1.7rem;
+      gap: 2px;
+    }
+
+    .side-actions .action-btn span {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .side-actions .action-btn i {
+      transition: 0.2s;
+    }
+
+    .side-actions .action-btn:hover i {
+      transform: scale(1.15);
+      color: #ff5a7c;
+    }
+
+    .side-actions .action-btn.liked i {
+      color: #ff3b6f;
+    }
+
+    /* bottom nav (minimal) */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 11, 16, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.7rem 0.5rem 1.2rem;
+      z-index: 30;
+    }
+
+    .bottom-nav .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #8888aa;
+      font-size: 0.6rem;
+      transition: 0.2s;
+      cursor: pointer;
+      gap: 4px;
+    }
+
+    .bottom-nav .nav-item i {
+      font-size: 1.5rem;
+      transition: 0.2s;
+    }
+
+    .bottom-nav .nav-item.active {
+      color: #ff5a7c;
+    }
+
+    .bottom-nav .nav-item.active i {
+      transform: scale(1.05);
+      text-shadow: 0 0 20px #ff3b6f55;
+    }
+
+    .bottom-nav .nav-item:hover {
+      color: #e0e0ff;
+    }
+
+    /* indicator for scroll */
+    .scroll-hint {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      color: rgba(255,255,255,0.15);
+      font-size: 1.4rem;
+      animation: bounce 2s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.3; }
+      50% { transform: translateX(-50%) translateY(-8px); opacity: 0.8; }
+    }
+
+    /* responsive */
+    @media (max-width: 460px) {
+      .feed-container { max-height: 100vh; border-radius: 0; }
+      .video-item { max-height: 100vh; }
+      .video-info .caption { max-width: 70%; font-size: 0.9rem; }
+      .side-actions { right: 8px; gap: 18px; }
+      .side-actions .action-btn { font-size: 1.5rem; }
+    }
+
+    /* small demo avatars */
+    .avatar-pic {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #2a2a4a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #aaaae0;
+      border: 2px solid rgba(255,255,255,0.08);
+    }
+  </style>
+</head>
+<body>
+
+<div class="feed-container">
+  <!-- top bar -->
+  <div class="top-bar">
+    <div class="brand">
+      <i class="fas fa-bolt"></i>
+      <span>popshot</span>
+    </div>
+    <div class="actions">
+      <i class="fas fa-search"></i>
+      <i class="fas fa-bell"></i>
+    </div>
+  </div>
+
+  <!-- scrollable video feed -->
+  <div class="video-scroll" id="videoScroll">
+    <!-- video 1 -->
+    <div class="video-item" data-index="0">
+      <div class="video-placeholder">
+        <i class="fas fa-play-circle"></i>
+      </div>
+      <div class="gradient-overlay"></div>
+
+      <div class="video-info">
+        <div class="user">
+          <div class="avatar-pic"><i class="fas fa-user-astronaut"></i></div>
+          @vibewave · <span style="font-weight:400; font-size:0.8rem; opacity:0.7;">2h ago</span>
+        </div>
+        <div class="caption">
+          <i class="fas fa-music"></i> Sunset dreams · #vibes
+        </div>
+      </div>
+
+      <div class="side-actions">
+        <div class="action-btn" data-action="like">
+          <i class="fas fa-heart"></i>
+          <span>2.1k</span>
+        </div>
+        <div class="action-btn" data-action="comment">
+          <i class="fas fa-comment"></i>
+          <span>184</span>
+        </div>
+        <div class="action-btn" data-action="share">
+          <i class="fas fa-share"></i>
+          <span>56</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- video 2 -->
+    <div class="video-item" data-index="1">
+      <div class="video-placeholder" style="background: #1e1e30;">
+        <i class="fas fa-play-circle"></i>
+      </div>
+      <div class="gradient-overlay"></div>
+
+      <div class="video-info">
+        <div class="user">
+          <div class="avatar-pic"><i class="fas fa-robot"></i></div>
+          @neonpulse · <span style="font-weight:400; font-size:0.8rem; opacity:0.7;">5h ago</span>
+        </div>
+        <div class="caption">
+          <i class="fas fa-bolt"></i> Cyberpunk city loop
+        </div>
+      </div>
+
+      <div class="side-actions">
+        <div class="action-btn" data-action="like">
+          <i class="fas fa-heart"></i>
+          <span>3.4k</span>
+        </div>
+        <div class="action-btn" data-action="comment">
+          <i class="fas fa-comment"></i>
+          <span>312</span>
+        </div>
+        <div class="action-btn" data-action="share">
+          <i class="fas fa-share"></i>
+          <span>89</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- video 3 -->
+    <div class="video-item" data-index="2">
+      <div class="video-placeholder" style="background: #1a1a28;">
+        <i class="fas fa-play-circle"></i>
+      </div>
+      <div class="gradient-overlay"></div>
+
+      <div class="video-info">
+        <div class="user">
+          <div class="avatar-pic"><i class="fas fa-cat"></i></div>
+          @pawtraits · <span style="font-weight:400; font-size:0.8rem; opacity:0.7;">8h ago</span>
+        </div>
+        <div class="caption">
+          <i class="fas fa-paw"></i> Whiskers & chill 🐾
+        </div>
+      </div>
+
+      <div class="side-actions">
+        <div class="action-btn" data-action="like">
+          <i class="fas fa-heart"></i>
+          <span>5.7k</span>
+        </div>
+        <div class="action-btn" data-action="comment">
+          <i class="fas fa-comment"></i>
+          <span>421</span>
+        </div>
+        <div class="action-btn" data-action="share">
+          <i class="fas fa-share"></i>
+          <span>128</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- video 4 -->
+    <div class="video-item" data-index="3">
+      <div class="video-placeholder" style="background: #16162a;">
+        <i class="fas fa-play-circle"></i>
+      </div>
+      <div class="gradient-overlay"></div>
+
+      <div class="video-info">
+        <div class="user">
+          <div class="avatar-pic"><i class="fas fa-dumbbell"></i></div>
+          @ironminds · <span style="font-weight:400; font-size:0.8rem; opacity:0.7;">12h ago</span>
+        </div>
+        <div class="caption">
+          <i class="fas fa-fire"></i> 5am grind · no excuses
+        </div>
+      </div>
+
+      <div class="side-actions">
+        <div class="action-btn" data-action="like">
+          <i class="fas fa-heart"></i>
+          <span>1.2k</span>
+        </div>
+        <div class="action-btn" data-action="comment">
+          <i class="fas fa-comment"></i>
+          <span>94</span>
+        </div>
+        <div class="action-btn" data-action="share">
+          <i class="fas fa-share"></i>
+          <span>33</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- video 5 (extra) -->
+    <div class="video-item" data-index="4">
+      <div class="video-placeholder" style="background: #1c1c2e;">
+        <i class="fas fa-play-circle"></i>
+      </div>
+      <div class="gradient-overlay"></div>
+
+      <div class="video-info">
+        <div class="user">
+          <div class="avatar-pic"><i class="fas fa-moon"></i></div>
+          @lunarphase · <span style="font-weight:400; font-size:0.8rem; opacity:0.7;">1d ago</span>
+        </div>
+        <div class="caption">
+          <i class="fas fa-star"></i> Stargazing · cosmic vibes
+        </div>
+      </div>
+
+      <div class="side-actions">
+        <div class="action-btn" data-action="like">
+          <i class="fas fa-heart"></i>
+          <span>8.9k</span>
+        </div>
+        <div class="action-btn" data-action="comment">
+          <i class="fas fa-comment"></i>
+          <span>673</span>
+        </div>
+        <div class="action-btn" data-action="share">
+          <i class="fas fa-share"></i>
+          <span>210</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- scroll hint (down arrow) -->
+  <div class="scroll-hint">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+
+  <!-- bottom navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active"><i class="fas fa-home"></i><span>Home</span></div>
+    <div class="nav-item"><i class="fas fa-compass"></i><span>Explore</span></div>
+    <div class="nav-item"><i class="fas fa-plus-circle"></i><span>Create</span></div>
+    <div class="nav-item"><i class="fas fa-inbox"></i><span>Inbox</span></div>
+    <div class="nav-item"><i class="fas fa-user"></i><span>Profile</span></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    "use strict";
+
+    // ----- like button toggle (demo) -----
+    const likeBtns = document.querySelectorAll('.action-btn[data-action="like"]');
+    likeBtns.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const icon = this.querySelector('i');
+        const span = this.querySelector('span');
+        // toggle like state
+        if (this.classList.contains('liked')) {
+          this.classList.remove('liked');
+          icon.style.color = '#f0f0ff';
+          // decrease count by 1 (if >0)
+          let count = parseInt(span.innerText.replace(/,/g, ''), 10);
+          if (count > 0) count--;
+          span.innerText = count >= 1000 ? (count/1000).toFixed(1)+'k' : count;
+        } else {
+          this.classList.add('liked');
+          icon.style.color = '#ff3b6f';
+          let count = parseInt(span.innerText.replace(/,/g, ''), 10);
+          count++;
+          span.innerText = count >= 1000 ? (count/1000).toFixed(1)+'k' : count;
+        }
+      });
+    });
+
+    // ----- comment & share demo alert -----
+    document.querySelectorAll('.action-btn[data-action="comment"], .action-btn[data-action="share"]').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const action = this.dataset.action;
+        if (action === 'comment') {
+          alert('💬 Comments would open here (demo)');
+        } else if (action === 'share') {
+          alert('🔗 Share link copied (demo)');
+        }
+      });
+    });
+
+    // ----- bottom nav demo highlight -----
+    const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', function() {
+        navItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        // optional feedback
+        const label = this.querySelector('span')?.innerText || 'tab';
+        alert('📍 ' + label + ' (demo navigation)');
+      });
+    });
+
+    // ----- top bar icons demo -----
+    document.querySelector('.top-bar .actions .fa-search')?.addEventListener('click', function() {
+      alert('🔍 Search (demo)');
+    });
+    document.querySelector('.top-bar .actions .fa-bell')?.addEventListener('click', function() {
+      alert('🔔 Notifications (demo)');
+    });
+
+    // ----- scroll hint disappear after scroll -----
+    const scrollContainer = document.getElementById('videoScroll');
+    const hint = document.querySelector('.scroll-hint');
+    if (scrollContainer && hint) {
+      scrollContainer.addEventListener('scroll', function() {
+        if (this.scrollTop > 30) {
+          hint.style.opacity = '0';
+          hint.style.transition = 'opacity 0.4s';
+        } else {
+          hint.style.opacity = '1';
+        }
+      });
+    }
+
+    // ----- (optional) auto play / pause on visibility? not needed for demo -----
+    console.log('Popshot feed ready · scroll to view videos');
+  })();
+</script>
+
+</body>
+</html>
