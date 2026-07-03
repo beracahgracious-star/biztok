@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Popshot · Create</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #0b0b10;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .create-container {
+            width: 100%;
+            max-width: 460px;
+            background: rgba(16, 16, 28, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 48px;
+            padding: 2rem 1.8rem 2rem;
+            border: 1px solid rgba(255, 70, 120, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 70, 120, 0.03);
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .create-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.8rem;
+        }
+
+        .header .back-btn {
+            color: #b0b0d4;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 4px;
+        }
+
+        .header .back-btn:hover {
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .header .brand {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header .brand i {
+            background: linear-gradient(145deg, #ff3b6f, #ff8a5c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px #ff3b6f55);
+            font-size: 1.8rem;
+        }
+
+        .header .brand span {
+            background: linear-gradient(145deg, #ffffff, #d0d0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* guidelines banner */
+        .guidelines {
+            background: rgba(255, 59, 111, 0.06);
+            border: 1px solid rgba(255, 59, 111, 0.1);
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .guidelines i {
+            color: #ff5a7c;
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .guidelines .content {
+            flex: 1;
+        }
+
+        .guidelines .title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #e0e0ff;
+            margin-bottom: 4px;
+        }
+
+        .guidelines .list {
+            font-size: 0.75rem;
+            color: #8a8ab0;
+            line-height: 1.6;
+        }
+
+        .guidelines .list span {
+            display: inline-block;
+            margin-right: 12px;
+        }
+
+        .guidelines .list .no {
+            color: #ff5a7c;
+            font-weight: 600;
+        }
+
+        /* form */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #b0b0d4;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: #ff5a7c;
+            width: 18px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            padding: 0 18px;
+            transition: all 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #ff3b6f;
+            box-shadow: 0 0 0 4px rgba(255, 59, 111, 0.08);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .input-wrapper i {
+            color: #7070a0;
+            font-size: 1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .input-wrapper input,
+        .input-wrapper textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 14px 10px;
+            font-size: 0.95rem;
+            outline: none;
+            color: #f0f0ff;
+            font-weight: 500;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .input-wrapper textarea {
+            min-height: 60px;
+            padding: 14px 10px;
+        }
+
+        .input-wrapper input::placeholder,
+        .input-wrapper textarea::placeholder {
+            color: #6a6a92;
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        /* file upload area */
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.25s;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .upload-area:hover {
+            border-color: rgba(255, 59, 111, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .upload-area i {
+            font-size: 2.8rem;
+            color: #3a3a5a;
+            margin-bottom: 8px;
+        }
+
+        .upload-area .label {
+            font-size: 0.9rem;
+            color: #b0b0d4;
+        }
+
+        .upload-area .sub {
+            font-size: 0.75rem;
+            color: #6a6a92;
+            margin-top: 4px;
+        }
+
+        .upload-area .file-name {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #ff5a7c;
+            font-weight: 500;
+        }
+
+        .upload-area .file-type-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-top: 6px;
+            background: rgba(255, 59, 111, 0.1);
+            border: 1px solid rgba(255, 59, 111, 0.15);
+            color: #ff5a7c;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* sound library & upload */
+        .sound-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 0.8rem 1rem;
+            margin-top: 6px;
+        }
+
+        .sound-section .sound-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .sound-section .sound-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sound-section .sound-item.selected {
+            border-color: rgba(255, 59, 111, 0.3);
+            background: rgba(255, 59, 111, 0.06);
+        }
+
+        .sound-section .sound-item .icon {
+            color: #ff5a7c;
+            font-size: 1.2rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .sound-section .sound-item .info {
+            flex: 1;
+        }
+
+        .sound-section .sound-item .info .name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e0e0ff;
+        }
+
+        .sound-section .sound-item .info .artist {
+            font-size: 0.75rem;
+            color: #6a6a92;
+        }
+
+        .sound-section .sound-item .check {
+            color: #66d9a0;
+            font-size: 1rem;
+        }
+
+        .sound-upload-area {
+            margin-top: 10px;
+            padding: 12px 16px;
+            border: 1.5px dashed rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .sound-upload-area:hover {
+            border-color: rgba(255, 59, 111, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sound-upload-area i {
+            color: #ff5a7c;
+            font-size: 1.2rem;
+        }
+
+        .sound-upload-area .label {
+            flex: 1;
+            font-size: 0.85rem;
+            color: #b0b0d4;
+        }
+
+        .sound-upload-area .file-name {
+            font-size: 0.8rem;
+            color: #ff5a7c;
+        }
+
+        #soundInput {
+            display: none;
+        }
+
+        /* hashtag chips */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+            min-height: 28px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 59, 111, 0.08);
+            border: 1px solid rgba(255, 59, 111, 0.1);
+            border-radius: 30px;
+            padding: 3px 10px 3px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #d0d0f0;
+        }
+
+        .chip .remove-chip {
+            cursor: pointer;
+            color: #6a6a92;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+
+        .chip .remove-chip:hover {
+            color: #ff5a7c;
+        }
+
+        .chip-limit-hint {
+            font-size: 0.7rem;
+            color: #5a5a82;
+            margin-top: 4px;
+        }
+
+        /* submit button */
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(145deg, #ff3b6f, #ff6b4a);
+            border: none;
+            padding: 17px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 8px 28px rgba(255, 59, 111, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 40px rgba(255, 59, 111, 0.4);
+            background: linear-gradient(145deg, #ff2a5e, #ff5a3a);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* message box */
+        .message-box {
+            padding: 0.8rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message-box.error {
+            display: block;
+            background: rgba(255, 59, 111, 0.12);
+            border: 1px solid rgba(255, 59, 111, 0.2);
+            color: #ff7a9c;
+        }
+
+        .message-box.success {
+            display: block;
+            background: rgba(0, 230, 118, 0.08);
+            border: 1px solid rgba(0, 230, 118, 0.15);
+            color: #66d9a0;
+        }
+
+        /* bottom nav */
+        .bottom-nav {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8888aa;
+            font-size: 0.55rem;
+            transition: 0.2s;
+            cursor: pointer;
+            gap: 2px;
+        }
+
+        .bottom-nav .nav-item i {
+            font-size: 1.3rem;
+            transition: 0.2s;
+        }
+
+        .bottom-nav .nav-item.active {
+            color: #ff5a7c;
+        }
+
+        .bottom-nav .nav-item:hover {
+            color: #e0e0ff;
+        }
+
+        /* responsive */
+        @media (max-width: 460px) {
+            .create-container {
+                padding: 1.5rem 1.2rem;
+                border-radius: 28px;
+            }
+            .upload-area {
+                padding: 1.5rem 1rem;
+            }
+            .sound-upload-area {
+                padding: 10px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="create-container">
+    <!-- header -->
+    <div class="header">
+        <div class="brand">
+            <i class="fas fa-bolt"></i>
+            <span>popshot</span>
+        </div>
+        <div class="back-btn" id="backBtn">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+    </div>
+
+    <!-- guidelines -->
+    <div class="guidelines">
+        <i class="fas fa-shield-alt"></i>
+        <div class="content">
+            <div class="title">📋 Content Guidelines</div>
+            <div class="list">
+                <span><span class="no">✕</span> Graphic violence</span>
+                <span><span class="no">✕</span> Pornography</span>
+                <span><span class="no">✕</span> Hate speech</span>
+                <span><span class="no">✕</span> Uncivil behaviour</span>
+                <span style="display:block; margin-top:4px; color:#66d9a0;">✓ Creative, positive, &amp; safe content only</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- form -->
+    <form id="createForm" action="#" method="POST" enctype="multipart/form-data">
+        <div id="formMessage" class="message-box"></div>
+
+        <!-- file upload (video & photo) -->
+        <div class="form-group">
+            <label><i class="fas fa-file-upload"></i> Upload media</label>
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="label">Tap to select video or photo</div>
+                <div class="sub">MP4, MOV, JPG, PNG · max 100MB</div>
+                <div class="file-name" id="fileName"></div>
+                <div class="file-type-badge" id="fileTypeBadge"></div>
+            </div>
+            <input type="file" id="fileInput" accept="video/*,image/*">
+        </div>
+
+        <!-- sound library & upload -->
+        <div class="form-group">
+            <label><i class="fas fa-volume-up"></i> Add sound</label>
+            <div class="sound-section" id="soundSection">
+                <!-- Library sounds -->
+                <div class="sound-item" data-sound="1">
+                    <div class="icon"><i class="fas fa-music"></i></div>
+                    <div class="info">
+                        <div class="name">Sunset Vibes</div>
+                        <div class="artist">Popshot Records</div>
+                    </div>
+                    <div class="check" style="display:none;"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="sound-item" data-sound="2">
+                    <div class="icon"><i class="fas fa-music"></i></div>
+                    <div class="info">
+                        <div class="name">Neon Dreams</div>
+                        <div class="artist">Synthwave Collective</div>
+                    </div>
+                    <div class="check" style="display:none;"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="sound-item" data-sound="3">
+                    <div class="icon"><i class="fas fa-music"></i></div>
+                    <div class="info">
+                        <div class="name">Urban Flow</div>
+                        <div class="artist">City Beats</div>
+                    </div>
+                    <div class="check" style="display:none;"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="sound-item" data-sound="4">
+                    <div class="icon"><i class="fas fa-music"></i></div>
+                    <div class="info">
+                        <div class="name">Acoustic Chill</div>
+                        <div class="artist">Indie Folk</div>
+                    </div>
+                    <div class="check" style="display:none;"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="sound-item" data-sound="5">
+                    <div class="icon"><i class="fas fa-music"></i></div>
+                    <div class="info">
+                        <div class="name">Bass Drop</div>
+                        <div class="artist">EDM Lab</div>
+                    </div>
+                    <div class="check" style="display:none;"><i class="fas fa-check-circle"></i></div>
+                </div>
+
+                <!-- Upload your own sound -->
+                <div class="sound-upload-area" id="soundUploadArea">
+                    <i class="fas fa-upload"></i>
+                    <div class="label">Upload your own sound</div>
+                    <div class="file-name" id="soundFileName"></div>
+                </div>
+                <input type="file" id="soundInput" accept="audio/*">
+            </div>
+            <div style="font-size:0.7rem; color:#5a5a82; margin-top:6px;">
+                <i class="fas fa-info-circle"></i> Select a sound from the library or upload your own
+            </div>
+        </div>
+
+        <!-- title -->
+        <div class="form-group">
+            <label for="videoTitle"><i class="fas fa-heading"></i> Title</label>
+            <div class="input-wrapper">
+                <i class="fas fa-pencil-alt"></i>
+                <input type="text" id="videoTitle" placeholder="Give your post a title" maxlength="60" required>
+            </div>
+        </div>
+
+        <!-- description -->
+        <div class="form-group">
+            <label for="videoDesc"><i class="fas fa-align-left"></i> Description</label>
+            <div class="input-wrapper">
+                <i class="fas fa-comment"></i>
+                <textarea id="videoDesc" placeholder="Describe your post (optional)" maxlength="500"></textarea>
+            </div>
+        </div>
+
+        <!-- hashtags -->
+        <div class="form-group">
+            <label><i class="fas fa-hashtag"></i> Hashtags <span style="color:#5a5a82; font-weight:400; text-transform:none;">(max 7)</span></label>
+            <div class="hashtag-row" style="display:flex; gap:10px;">
+                <div class="input-wrapper" style="flex:1;">
+                    <i class="fas fa-hashtag"></i>
+                    <input type="text" id="hashtagInput" placeholder="e.g. travel, music" maxlength="25" autocomplete="off">
+                </div>
+                <button type="button" class="btn-add" id="addHashtagBtn" style="background:rgba(255,59,111,0.12); border:1px solid rgba(255,59,111,0.15); border-radius:30px; padding:0 18px; color:#ff5a7c; font-weight:700; font-size:0.85rem; cursor:pointer; transition:0.2s; white-space:nowrap;">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="chips-container" id="chipsContainer"></div>
+            <div class="chip-limit-hint" id="chipLimitHint">0 / 7 hashtags</div>
+        </div>
+
+        <!-- submit -->
+        <button type="submit" class="btn-primary" id="submitBtn">
+            <i class="fas fa-upload"></i> Post
+        </button>
+    </form>
+
+    <!-- bottom nav -->
+    <div class="bottom-nav">
+        <div class="nav-item"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item"><i class="fas fa-compass"></i><span>Explore</span></div>
+        <div class="nav-item active"><i class="fas fa-plus-circle"></i><span>Create</span></div>
+        <div class="nav-item"><i class="fas fa-inbox"></i><span>Inbox</span></div>
+        <div class="nav-item"><i class="fas fa-user"></i><span>Profile</span></div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // ----- profanity / bad content filter (blocklist) -----
+        const BLOCKLIST = [
+            'graphic', 'gore', 'violence', 'blood', 'kill', 'murder', 'death',
+            'porn', 'sex', 'nude', 'naked', 'erotic', 'xxx', 'fuck', 'shit',
+            'hate', 'racist', 'slur', 'discrimination', 'harass', 'bully',
+            'drug', 'weed', 'cocaine', 'heroin', 'meth', 'alcohol', 'drunk',
+            'gamble', 'casino', 'bet', 'lottery', 'terror', 'bomb', 'attack',
+            'uncivil', 'rude', 'abuse', 'toxic', 'offensive', 'inappropriate',
+            'pornography', 'graphic content', 'bad content', 'uncouth'
+        ];
+
+        // DOM refs
+        const form = document.getElementById('createForm');
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileName = document.getElementById('fileName');
+        const fileTypeBadge = document.getElementById('fileTypeBadge');
+        const titleInput = document.getElementById('videoTitle');
+        const descInput = document.getElementById('videoDesc');
+        const hashtagInput = document.getElementById('hashtagInput');
+        const addHashtagBtn = document.getElementById('addHashtagBtn');
+        const chipsContainer = document.getElementById('chipsContainer');
+        const chipLimitHint = document.getElementById('chipLimitHint');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageBox = document.getElementById('formMessage');
+        const soundItems = document.querySelectorAll('.sound-item');
+        const soundUploadArea = document.getElementById('soundUploadArea');
+        const soundInput = document.getElementById('soundInput');
+        const soundFileName = document.getElementById('soundFileName');
+
+        let selectedFile = null;
+        let hashtags = [];
+        let selectedSound = null;
+        let customSoundFile = null;
+
+        const MAX_HASHTAGS = 7;
+
+        // ----- helper: show message -----
+        function showMessage(msg, type = 'error') {
+            messageBox.textContent = msg;
+            messageBox.className = 'message-box ' + type;
+            clearTimeout(window.msgTimeout);
+            window.msgTimeout = setTimeout(() => {
+                messageBox.className = 'message-box';
+                messageBox.textContent = '';
+            }, 6000);
+        }
+
+        // ----- profanity check (case-insensitive) -----
+        function containsBlockedContent(text) {
+            if (!text) return false;
+            const lower = text.toLowerCase();
+            return BLOCKLIST.some(word => lower.includes(word));
+        }
+
+        // ----- validate content -----
+        function validateContent(text, fieldName) {
+            if (!text || text.trim().length === 0) return true;
+            if (containsBlockedContent(text)) {
+                showMessage(`⛔ "${fieldName}" contains inappropriate language. Please revise.`, 'error');
+                return false;
+            }
+            return true;
+        }
+
+        // ----- file upload handling (video/photo) -----
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const fileType = file.type;
+
+                if (!fileType.startsWith('video/') && !fileType.startsWith('image/')) {
+                    showMessage('⚠️ Please select a video or image file.', 'error');
+                    this.value = '';
+                    fileName.textContent = '';
+                    fileTypeBadge.textContent = '';
+                    selectedFile = null;
+                    return;
+                }
+
+                if (file.size > 100 * 1024 * 1024) {
+                    showMessage('⚠️ File too large. Max 100MB.', 'error');
+                    this.value = '';
+                    fileName.textContent = '';
+                    fileTypeBadge.textContent = '';
+                    selectedFile = null;
+                    return;
+                }
+
+                selectedFile = file;
+                const fileSize = (file.size / 1024 / 1024).toFixed(1);
+                const typeLabel = fileType.startsWith('video/') ? '🎬 Video' : '🖼️ Photo';
+                fileName.textContent = `${typeLabel}: ${file.name} (${fileSize} MB)`;
+                fileTypeBadge.textContent = fileType.startsWith('video/') ? 'VIDEO' : 'PHOTO';
+
+                showMessage('✅ File selected!', 'success');
+                setTimeout(() => {
+                    if (messageBox.className.includes('success')) {
+                        messageBox.className = 'message-box';
+                        messageBox.textContent = '';
+                    }
+                }, 2000);
+            }
+        });
+
+        // ----- sound library selection -----
+        soundItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // deselect all library sounds
+                soundItems.forEach(i => {
+                    i.classList.remove('selected');
+                    i.querySelector('.check').style.display = 'none';
+                });
+                // deselect custom sound
+                customSoundFile = null;
+                soundFileName.textContent = '';
+                soundUploadArea.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+
+                // select this one
+                this.classList.add('selected');
+                this.querySelector('.check').style.display = 'block';
+                selectedSound = this.dataset.sound;
+                const name = this.querySelector('.name').textContent;
+                showMessage(`🎵 "${name}" selected`, 'success');
+                setTimeout(() => {
+                    if (messageBox.className.includes('success')) {
+                        messageBox.className = 'message-box';
+                        messageBox.textContent = '';
+                    }
+                }, 1500);
+            });
+        });
+
+        // ----- custom sound upload -----
+        soundUploadArea.addEventListener('click', () => soundInput.click());
+
+        soundInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                if (!file.type.startsWith('audio/')) {
+                    showMessage('⚠️ Please select an audio file.', 'error');
+                    this.value = '';
+                    return;
+                }
+
+                if (file.size > 20 * 1024 * 1024) {
+                    showMessage('⚠️ Sound file too large. Max 20MB.', 'error');
+                    this.value = '';
+                    return;
+                }
+
+                customSoundFile = file;
+                soundFileName.textContent = `📁 ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+                soundUploadArea.style.borderColor = 'rgba(255, 59, 111, 0.3)';
+
+                // deselect library sounds
+                soundItems.forEach(i => {
+                    i.classList.remove('selected');
+                    i.querySelector('.check').style.display = 'none';
+                });
+                selectedSound = null;
+
+                showMessage('✅ Custom sound uploaded!', 'success');
+                setTimeout(() => {
+                    if (messageBox.className.includes('success')) {
+                        messageBox.className = 'message-box';
+                        messageBox.textContent = '';
+                    }
+                }, 2000);
+            }
+        });
+
+        // ----- hashtag management (max 7) -----
+        function normalizeTag(tag) {
+            return tag.trim().toLowerCase().replace(/^#/, '').replace(/\s+/g, '');
+        }
+
+        function isValidTag(tag) {
+            const normalized = normalizeTag(tag);
+            return normalized.length > 0 && normalized.length <= 20 && /^[a-z0-9_]+$/.test(normalized);
+        }
+
+        function updateChipLimit() {
+            chipLimitHint.textContent = `${hashtags.length} / ${MAX_HASHTAGS} hashtags`;
+            if (hashtags.length >= MAX_HASHTAGS) {
+                chipLimitHint.style.color = '#ff5a7c';
+            } else {
+                chipLimitHint.style.color = '#5a5a82';
+            }
+        }
+
+        function addHashtag() {
+            const raw = hashtagInput.value.trim();
+            if (!raw) {
+                showMessage('⚠️ Please enter a hashtag.', 'error');
+                return;
+            }
+
+            if (hashtags.length >= MAX_HASHTAGS) {
+                showMessage(`⚠️ Maximum ${MAX_HASHTAGS} hashtags allowed.`, 'error');
+                return;
+            }
+
+            if (containsBlockedContent(raw)) {
+                showMessage('⛔ Hashtag contains inappropriate language.', 'error');
+                hashtagInput.value = '';
+                return;
+            }
+
+            const normalized = normalizeTag(raw);
+            if (!isValidTag(raw)) {
+                showMessage('⚠️ Hashtags: letters, numbers, underscores (max 20 chars).', 'error');
+                return;
+            }
+
+            if (hashtags.includes(normalized)) {
+                showMessage(`⚠️ "#${normalized}" already added.`, 'error');
+                return;
+            }
+
+            hashtags.push(normalized);
+            renderChips();
+            hashtagInput.value = '';
+            hashtagInput.focus();
+            updateChipLimit();
+            showMessage(`✅ #${normalized} added`, 'success');
+            setTimeout(() => {
+                if (messageBox.className.includes('success')) {
+                    messageBox.className = 'message-box';
+                    messageBox.textContent = '';
+                }
+            }, 1200);
+        }
+
+        function removeHashtag(tag) {
+            hashtags = hashtags.filter(t => t !== tag);
+            renderChips();
+            updateChipLimit();
+        }
+
+        function renderChips() {
+            chipsContainer.innerHTML = '';
+            if (hashtags.length === 0) {
+                const hint = document.createElement('span');
+                hint.style.cssText = 'font-size:0.7rem; color:#5a5a82; padding:2px 0;';
+                hint.textContent = 'add hashtags to help others find your post';
+                chipsContainer.appendChild(hint);
+                return;
+            }
+            hashtags.forEach(tag => {
+                const chip = document.createElement('span');
+                chip.className = 'chip';
+                chip.innerHTML = `
+                    #${tag}
+                    <span class="remove-chip" data-tag="${tag}"><i class="fas fa-times"></i></span>
+                `;
+                chipsContainer.appendChild(chip);
+            });
+            document.querySelectorAll('.remove-chip').forEach(el => {
+                el.addEventListener('click', function() {
+                    const tag = this.dataset.tag;
+                    removeHashtag(tag);
+                });
+            });
+        }
+
+        // ----- form submission -----
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            messageBox.className = 'message-box';
+            messageBox.textContent = '';
+
+            // 1. check file
+            if (!selectedFile) {
+                showMessage('⚠️ Please select a video or photo to upload.', 'error');
+                return;
+            }
+
+            // 2. title
+            const title = titleInput.value.trim();
+            if (!title) {
+                showMessage('⚠️ Please enter a title.', 'error');
+                return;
+            }
+            if (title.length < 3) {
+                showMessage('⚠️ Title must be at least 3 characters.', 'error');
+                return;
+            }
+            if (!validateContent(title, 'Title')) return;
+
+            // 3. description (optional)
+            const desc = descInput.value.trim();
+            if (desc && !validateContent(desc, 'Description')) return;
+
+            // 4. check hashtags
+            for (const tag of hashtags) {
+                if (containsBlockedContent(tag)) {
+                    showMessage(`⛔ Hashtag "#${tag}" contains inappropriate content.`, 'error');
+                    return;
+                }
+            }
+
+            // 5. final content scan
+            const combined = `${title} ${desc} ${hashtags.join(' ')}`;
+            if (containsBlockedContent(combined)) {
+                showMessage('⛔ Your content contains inappropriate language. Please revise.', 'error');
+                return;
+            }
+
+            // 6. sound is optional
+            const mediaType = selectedFile.type.startsWith('video/') ? 'Video' : 'Photo';
+            let soundName = 'No sound';
+            if (customSoundFile) {
+                soundName = `Custom sound: ${customSoundFile.name}`;
+            } else if (selectedSound) {
+                const soundItem = document.querySelector(`.sound-item[data-sound="${selectedSound}"]`);
+                if (soundItem) {
+                    soundName = soundItem.querySelector('.name').textContent;
+                }
+            }
+
+            showMessage(`🎉 ${mediaType} posted successfully! 🔊 ${soundName}`, 'success');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Posting...';
+
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-upload"></i> Post';
+                // reset form
+                form.reset();
+                selectedFile = null;
+                fileName.textContent = '';
+                fileTypeBadge.textContent = '';
+                hashtags = [];
+                selectedSound = null;
+                customSoundFile = null;
+                soundFileName.textContent = '';
+                soundUploadArea.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                soundItems.forEach(i => {
+                    i.classList.remove('selected');
+                    i.querySelector('.check').style.display = 'none';
+                });
+                renderChips();
+                updateChipLimit();
+                fileInput.value = '';
+                soundInput.value = '';
+                messageBox.className = 'message-box';
+                messageBox.textContent = '';
+                alert(`✅ Demo: Your ${mediaType.toLowerCase()} would be live now with "${soundName}"!`);
+            }, 2000);
+        });
+
+        // ----- event listeners -----
+        addHashtagBtn.addEventListener('click', addHashtag);
+
+        hashtagInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addHashtag();
+            }
+        });
+
+        document.getElementById('backBtn').addEventListener('click', function() {
+            alert('🔙 Go back (demo)');
+        });
+
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                const label = this.querySelector('span')?.innerText || 'tab';
+                alert(`📍 ${label} (demo navigation)`);
+            });
+        });
+
+        // init
+        renderChips();
+        updateChipLimit();
+
+        console.log('Popshot Create · photos + videos + sounds (library & custom)');
+    })();
+</script>
+
+</body>
+</html>
