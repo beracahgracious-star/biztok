@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Popshot · Explore</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #0b0b10;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* main container */
+    .explore-container {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      max-height: 820px;
+      background: #0f0f16;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 60px rgba(255, 70, 120, 0.06);
+    }
+
+    /* top bar */
+    .top-bar {
+      padding: 1rem 1.2rem 0.6rem;
+      background: linear-gradient(180deg, rgba(11, 11, 16, 0.9) 0%, transparent 100%);
+      z-index: 20;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .top-bar .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-bar .brand .logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: white;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    }
+
+    .top-bar .brand .logo i {
+      background: linear-gradient(145deg, #ff3b6f, #ff8a5c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 12px #ff3b6f55);
+      font-size: 1.9rem;
+    }
+
+    .top-bar .brand .logo span {
+      background: linear-gradient(145deg, #ffffff, #d0d0f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .top-bar .brand .back-btn {
+      color: #b0b0d4;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 4px;
+    }
+
+    .top-bar .brand .back-btn:hover {
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    /* interest input area */
+    .interests-section {
+      padding: 0.8rem 1.2rem 0.6rem;
+      flex-shrink: 0;
+      background: rgba(11, 11, 16, 0.3);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .interests-section .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #8a8ab0;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .interests-section .label i {
+      color: #ff5a7c;
+      margin-right: 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input-row .input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid rgba(255, 255, 255, 0.06);
+      border-radius: 30px;
+      padding: 0 16px;
+      transition: all 0.2s;
+    }
+
+    .input-row .input-wrapper:focus-within {
+      border-color: #ff3b6f;
+      box-shadow: 0 0 0 4px rgba(255, 59, 111, 0.08);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .input-row .input-wrapper i {
+      color: #7070a0;
+      font-size: 0.9rem;
+    }
+
+    .input-row .input-wrapper input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 12px 10px;
+      font-size: 0.95rem;
+      outline: none;
+      color: #f0f0ff;
+      font-weight: 500;
+    }
+
+    .input-row .input-wrapper input::placeholder {
+      color: #6a6a92;
+      font-weight: 400;
+      font-size: 0.85rem;
+    }
+
+    .input-row .btn-add {
+      background: linear-gradient(145deg, #ff3b6f, #ff6b4a);
+      border: none;
+      border-radius: 30px;
+      padding: 12px 18px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(255, 59, 111, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-row .btn-add:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 24px rgba(255, 59, 111, 0.35);
+    }
+
+    .input-row .btn-add:active {
+      transform: scale(0.96);
+    }
+
+    .input-row .btn-add i {
+      font-size: 0.9rem;
+    }
+
+    /* hashtag chips */
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      min-height: 32px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 59, 111, 0.12);
+      border: 1px solid rgba(255, 59, 111, 0.15);
+      border-radius: 30px;
+      padding: 4px 12px 4px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #e0e0ff;
+      transition: 0.2s;
+      animation: chipIn 0.25s ease;
+    }
+
+    .chip .remove-chip {
+      cursor: pointer;
+      color: #8a8ab0;
+      font-size: 0.8rem;
+      transition: 0.2s;
+      padding: 2px;
+    }
+
+    .chip .remove-chip:hover {
+      color: #ff5a7c;
+      transform: scale(1.1);
+    }
+
+    .chip .hash {
+      color: #ff5a7c;
+      font-weight: 700;
+    }
+
+    @keyframes chipIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* video grid */
+    .video-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.2rem 0.8rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      scroll-behavior: smooth;
+    }
+
+    .video-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .grid-item {
+      position: relative;
+      aspect-ratio: 9 / 16;
+      background: #1a1a2e;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+
+    .grid-item:hover {
+      transform: scale(1.02);
+      border-color: rgba(255, 59, 111, 0.15);
+    }
+
+    .grid-item .placeholder-icon {
+      font-size: 2rem;
+      color: #3a3a5a;
+      opacity: 0.3;
+    }
+
+    .grid-item .video-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 6px 8px 8px;
+      background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+      font-size: 0.6rem;
+      color: #d0d0f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .grid-item .video-overlay i {
+      color: #ff5a7c;
+      font-size: 0.5rem;
+    }
+
+    .grid-item .video-overlay .hashtag-label {
+      opacity: 0.8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      color: #5a5a82;
+      text-align: center;
+      min-height: 200px;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: #2a2a4a;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state .title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #8a8ab0;
+      margin-bottom: 4px;
+    }
+
+    .empty-state .sub {
+      font-size: 0.85rem;
+      color: #6a6a92;
+    }
+
+    /* bottom nav */
+    .bottom-nav {
+      flex-shrink: 0;
+      background: rgba(11, 11, 16, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem 0.5rem 0.9rem;
+      z-index: 30;
+    }
+
+    .bottom-nav .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #8888aa;
+      font-size: 0.6rem;
+      transition: 0.2s;
+      cursor: pointer;
+      gap: 2px;
+    }
+
+    .bottom-nav .nav-item i {
+      font-size: 1.4rem;
+      transition: 0.2s;
+    }
+
+    .bottom-nav .nav-item.active {
+      color: #ff5a7c;
+    }
+
+    .bottom-nav .nav-item.active i {
+      text-shadow: 0 0 20px #ff3b6f55;
+    }
+
+    .bottom-nav .nav-item:hover {
+      color: #e0e0ff;
+    }
+
+    /* responsive */
+    @media (max-width: 460px) {
+      .explore-container { max-height: 100vh; border-radius: 0; }
+      .video-grid { gap: 3px; padding: 0.8rem 0.8rem 0.5rem; }
+      .grid-item { border-radius: 8px; }
+      .interests-section { padding: 0.6rem 0.8rem; }
+      .input-row .btn-add { padding: 10px 14px; font-size: 0.8rem; }
+    }
+
+    /* small scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.05);
+      font-size: 1.2rem;
+      pointer-events: none;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.2; }
+      50% { transform: translateX(-50%) translateY(-6px); opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="explore-container">
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="brand">
+      <div class="logo">
+        <i class="fas fa-bolt"></i>
+        <span>popshot</span>
+      </div>
+      <div class="back-btn" id="backBtn">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interests input -->
+  <div class="interests-section">
+    <div class="label"><i class="fas fa-hashtag"></i> your interests · add hashtags</div>
+    <div class="input-row">
+      <div class="input-wrapper">
+        <i class="fas fa-hashtag"></i>
+        <input type="text" id="hashtagInput" placeholder="e.g. travel, food, music" maxlength="25" autocomplete="off">
+      </div>
+      <button class="btn-add" id="addBtn"><i class="fas fa-plus"></i> Add</button>
+    </div>
+    <div class="chips-container" id="chipsContainer">
+      <!-- chips will be injected here -->
+    </div>
+  </div>
+
+  <!-- Video grid -->
+  <div class="video-grid" id="videoGrid">
+    <!-- empty state (visible when no hashtags) -->
+    <div class="empty-state" id="emptyState">
+      <i class="fas fa-compass"></i>
+      <div class="title">Explore your interests</div>
+      <div class="sub">Add hashtags above to find videos</div>
+    </div>
+  </div>
+
+  <!-- bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item"><i class="fas fa-home"></i><span>Home</span></div>
+    <div class="nav-item active"><i class="fas fa-compass"></i><span>Explore</span></div>
+    <div class="nav-item"><i class="fas fa-plus-circle"></i><span>Create</span></div>
+    <div class="nav-item"><i class="fas fa-inbox"></i><span>Inbox</span></div>
+    <div class="nav-item"><i class="fas fa-user"></i><span>Profile</span></div>
+  </div>
+
+  <div class="scroll-hint"><i class="fas fa-chevron-down"></i></div>
+</div>
+
+<script>
+  (function() {
+    "use strict";
+
+    // ----- mock video database (hashtag -> videos) -----
+    const VIDEO_DB = {
+      'travel': [
+        { id: 1, hashtag: '#travel', label: 'Bali sunset' },
+        { id: 2, hashtag: '#travel', label: 'Tokyo streets' },
+        { id: 3, hashtag: '#travel', label: 'Santorini' },
+        { id: 4, hashtag: '#travel', label: 'Alps hike' },
+        { id: 5, hashtag: '#travel', label: 'Maldives' },
+      ],
+      'food': [
+        { id: 6, hashtag: '#food', label: 'Sushi art' },
+        { id: 7, hashtag: '#food', label: 'Pizza time' },
+        { id: 8, hashtag: '#food', label: 'Dessert' },
+        { id: 9, hashtag: '#food', label: 'BBQ grill' },
+        { id: 10, hashtag: '#food', label: 'Ramen' },
+      ],
+      'music': [
+        { id: 11, hashtag: '#music', label: 'Live set' },
+        { id: 12, hashtag: '#music', label: 'Piano cover' },
+        { id: 13, hashtag: '#music', label: 'DJ mix' },
+        { id: 14, hashtag: '#music', label: 'Acoustic' },
+        { id: 15, hashtag: '#music', label: 'Drum solo' },
+      ],
+      'sports': [
+        { id: 16, hashtag: '#sports', label: 'Basketball' },
+        { id: 17, hashtag: '#sports', label: 'Skateboard' },
+        { id: 18, hashtag: '#sports', label: 'Surfing' },
+        { id: 19, hashtag: '#sports', label: 'Soccer' },
+        { id: 20, hashtag: '#sports', label: 'Climbing' },
+      ],
+      'tech': [
+        { id: 21, hashtag: '#tech', label: 'AI demo' },
+        { id: 22, hashtag: '#tech', label: 'Gadget review' },
+        { id: 23, hashtag: '#tech', label: 'Code tips' },
+        { id: 24, hashtag: '#tech', label: 'Robotics' },
+        { id: 25, hashtag: '#tech', label: 'VR experience' },
+      ],
+      'fashion': [
+        { id: 26, hashtag: '#fashion', label: 'Runway' },
+        { id: 27, hashtag: '#fashion', label: 'Street style' },
+        { id: 28, hashtag: '#fashion', label: 'Accessories' },
+        { id: 29, hashtag: '#fashion', label: 'Sneakers' },
+        { id: 30, hashtag: '#fashion', label: 'Vintage' },
+      ],
+      'gaming': [
+        { id: 31, hashtag: '#gaming', label: 'Battle royale' },
+        { id: 32, hashtag: '#gaming', label: 'RPG quest' },
+        { id: 33, hashtag: '#gaming', label: 'Speedrun' },
+        { id: 34, hashtag: '#gaming', label: 'Esports' },
+        { id: 35, hashtag: '#gaming', label: 'Indie game' },
+      ],
+      'art': [
+        { id: 36, hashtag: '#art', label: 'Digital art' },
+        { id: 37, hashtag: '#art', label: 'Sculpture' },
+        { id: 38, hashtag: '#art', label: 'Street art' },
+        { id: 39, hashtag: '#art', label: 'Watercolor' },
+        { id: 40, hashtag: '#art', label: 'Animation' },
+      ],
+    };
+
+    // DOM refs
+    const input = document.getElementById('hashtagInput');
+    const addBtn = document.getElementById('addBtn');
+    const chipsContainer = document.getElementById('chipsContainer');
+    const videoGrid = document.getElementById('videoGrid');
+    const emptyState = document.getElementById('emptyState');
+
+    // State: active hashtags
+    let activeHashtags = [];
+
+    // ----- helpers -----
+    function normalizeTag(tag) {
+      return tag.trim().toLowerCase().replace(/^#/, '').replace(/\s+/g, '');
+    }
+
+    function isValidTag(tag) {
+      const normalized = normalizeTag(tag);
+      return normalized.length > 0 && normalized.length <= 20 && /^[a-z0-9_]+$/.test(normalized);
+    }
+
+    // ----- render chips -----
+    function renderChips() {
+      chipsContainer.innerHTML = '';
+      if (activeHashtags.length === 0) {
+        // show a small placeholder hint
+        const placeholder = document.createElement('span');
+        placeholder.style.cssText = 'font-size:0.75rem; color:#5a5a82; padding:4px 0;';
+        placeholder.textContent = 'no interests yet — add some!';
+        chipsContainer.appendChild(placeholder);
+        return;
+      }
+
+      activeHashtags.forEach(tag => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `
+          <span class="hash">#</span>${tag}
+          <span class="remove-chip" data-tag="${tag}"><i class="fas fa-times"></i></span>
+        `;
+        chipsContainer.appendChild(chip);
+      });
+
+      // attach remove events
+      document.querySelectorAll('.remove-chip').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const tag = this.dataset.tag;
+          removeHashtag(tag);
+        });
+      });
+    }
+
+    // ----- add hashtag -----
+    function addHashtag(raw) {
+      const normalized = normalizeTag(raw);
+      if (!normalized) {
+        alert('Please enter a hashtag.');
+        return;
+      }
+      if (!isValidTag(raw)) {
+        alert('Hashtags can only contain letters, numbers, underscores (max 20 chars).');
+        return;
+      }
+      if (activeHashtags.includes(normalized)) {
+        alert(`"#${normalized}" is already added.`);
+        return;
+      }
+
+      activeHashtags.push(normalized);
+      renderChips();
+      renderVideos();
+      input.value = '';
+      input.focus();
+    }
+
+    // ----- remove hashtag -----
+    function removeHashtag(tag) {
+      activeHashtags = activeHashtags.filter(t => t !== tag);
+      renderChips();
+      renderVideos();
+    }
+
+    // ----- render videos based on active hashtags -----
+    function renderVideos() {
+      // clear grid but keep empty state
+      const items = videoGrid.querySelectorAll('.grid-item');
+      items.forEach(el => el.remove());
+
+      if (activeHashtags.length === 0) {
+        emptyState.style.display = 'flex';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      // collect videos from matching hashtags
+      let allVideos = [];
+      activeHashtags.forEach(tag => {
+        const videos = VIDEO_DB[tag] || [];
+        allVideos = allVideos.concat(videos);
+      });
+
+      // remove duplicates (by id)
+      const unique = [];
+      const seen = new Set();
+      allVideos.forEach(v => {
+        if (!seen.has(v.id)) {
+          seen.add(v.id);
+          unique.push(v);
+        }
+      });
+
+      // shuffle for variety
+      for (let i = unique.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [unique[i], unique[j]] = [unique[j], unique[i]];
+      }
+
+      // if no videos found
+      if (unique.length === 0) {
+        const emptyMsg = document.createElement('div');
+        emptyMsg.className = 'empty-state';
+        emptyMsg.style.display = 'flex';
+        emptyMsg.innerHTML = `
+          <i class="fas fa-search"></i>
+          <div class="title">No videos found</div>
+          <div class="sub">Try adding different hashtags</div>
+        `;
+        videoGrid.appendChild(emptyMsg);
+        return;
+      }
+
+      // render grid items (max 30 for performance)
+      const toShow = unique.slice(0, 30);
+      toShow.forEach(video => {
+        const item = document.createElement('div');
+        item.className = 'grid-item';
+        // random color variation for placeholders
+        const hue = Math.floor(Math.random() * 40) + 220;
+        item.style.background = `hsl(${hue}, 20%, 12%)`;
+        item.innerHTML = `
+          <div class="placeholder-icon"><i class="fas fa-play-circle"></i></div>
+          <div class="video-overlay">
+            <i class="fas fa-hashtag"></i>
+            <span class="hashtag-label">#${video.hashtag} · ${video.label}</span>
+          </div>
+        `;
+        item.addEventListener('click', function() {
+          alert(`🎬 Playing: ${video.label} (demo)`);
+        });
+        videoGrid.appendChild(item);
+      });
+    }
+
+    // ----- event listeners -----
+    addBtn.addEventListener('click', function() {
+      const val = input.value.trim();
+      if (val) addHashtag(val);
+    });
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = this.value.trim();
+        if (val) addHashtag(val);
+      }
+    });
+
+    // back button
+    document.getElementById('backBtn').addEventListener('click', function() {
+      alert('🔙 Go back to feed (demo)');
+    });
+
+    // bottom nav demo
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        const label = this.querySelector('span')?.innerText || 'tab';
+        alert(`📍 ${label} (demo navigation)`);
+      });
+    });
+
+    // seed with some default interests (optional)
+    // uncomment to start with some hashtags:
+    // ['travel', 'music', 'food'].forEach(t => addHashtag(t));
+
+    // initial render
+    renderChips();
+    renderVideos();
+
+    console.log('Popshot Explore · hashtag-based discovery');
+  })();
+</script>
+
+</body>
+</html>
